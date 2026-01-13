@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Role-Aware Task Translator",
+  "version": "1.0",
+  "description": "Translate Jira issues into role-specific tasks using AI",
+
+  "permissions": ["activeTab"],
+
+  "host_permissions": [
+    "*://*.atlassian.net/*",
+    "http://localhost:8000/*"
+  ],
+
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
