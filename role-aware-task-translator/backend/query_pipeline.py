@@ -1,37 +1,17 @@
-# import pinecone
-# import os
+# query_pipeline.py
 
-# def query_roles(embedding, top_k=3):
-#     pinecone.init(
-#         api_key=os.getenv("PINECONE_API_KEY"),
-#         environment=os.getenv("PINECONE_ENV")
-#     )
-#     index = pinecone.Index(os.getenv("PINECONE_INDEX"))
-#     result = index.query(vector=embedding, top_k=top_k, include_metadata=True)
-#     return result["matches"]
-
-
-
-from pinecone import Pinecone
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
-load_dotenv()  # ✅ REQUIRED
 
+load_dotenv()
+from pinecone import Pinecone
+from confidence import compute_retrieval_confidence
+
+# ✅ DEFINE pc HERE (this was missing)
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
-# def query_roles(embedding, top_k=5):
-#     index = pc.Index(os.getenv("PINECONE_INDEX"))
-
-#     result = index.query(
-#         vector=embedding,
-#         top_k=top_k,
-#         include_metadata=True
-#     )
-#     return result.matches
-
-
-def query_role_context(query_embedding, top_k=5, direct_threshold=0.85):
+def query_role_context(query_embedding, top_k=3):
     index = pc.Index(os.getenv("PINECONE_INDEX"))
 
     result = index.query(
@@ -40,15 +20,9 @@ def query_role_context(query_embedding, top_k=5, direct_threshold=0.85):
         include_metadata=True
     )
 
-    matches = result["matches"]
-    if not matches:
-        return []
+    matches = result.matches or []
 
-    #  Direct match logic
-    if matches[0]["score"] >= direct_threshold:
-        return [matches[0]["metadata"]]
+    confidence = compute_retrieval_confidence(matches)
+    contexts = [m.metadata for m in matches]
 
-    # 🔁 Fallback to Top-K
-    return [m["metadata"] for m in matches]
-
-
+    return contexts, float(confidence)

@@ -49,7 +49,7 @@ def load_roles_to_pinecone():
             text = f"{row['role_description']} {row['responsibilities']} {row['example_outputs']}"
             vectors.append({
                 "id": row["role"],
-                "values": generate_embedding(text
+                "values": generate_embedding(text),
                 "metadata": {
                     "role": row["role"],
                     "role_description": row["role_description"],
